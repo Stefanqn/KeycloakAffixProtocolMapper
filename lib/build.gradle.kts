@@ -1,8 +1,8 @@
 import java.net.URI
 
 plugins {
-    `maven-publish`
-    `java-library`
+  `maven-publish`
+  `java-library`
 }
 
 group = "utils.keycloak"
@@ -12,52 +12,52 @@ val javaVersion = 17 // current keycloaks java version
 val slf4jVersion = "2.0.6"
 
 version = System.getenv("GITHUB_TAG").let { tag ->
-    when {
-        tag == null -> "0.0.0"
-        tag.startsWith("v", true) -> tag.drop(1)
-        else -> tag
-    }
+  when {
+    tag == null -> "0.0.0"
+    tag.startsWith("v", true) -> tag.drop(1)
+    else -> tag
+  }
 }
 
 tasks.jar {
-    archiveBaseName = "affix-protocol-mapper" // e.g. affix-protocol-mapper-0.1.0.jar
-//    archiveFileName = "affix-protocol-mapper.jar" // exact filename
-    manifest {
-        attributes(
-            mapOf(
-                "Implementation-Title" to project.name,
-                "Implementation-Version" to rootProject.version
-            )
-        )
-    }
+  archiveBaseName = "affix-protocol-mapper" // e.g. affix-protocol-mapper-0.1.0.jar
+  project.version = "" //remove version from jar - for renovate
+  manifest {
+    attributes(
+      mapOf(
+        "Implementation-Title" to project.name,
+        "Implementation-Version" to rootProject.version
+      )
+    )
+  }
 }
 
 dependencies {
-    implementation(platform("org.keycloak.bom:keycloak-spi-bom:${keycloakVersion}"))
-    compileOnly("org.keycloak:keycloak-core")
-    compileOnly("org.keycloak:keycloak-services:${keycloakVersion}")
-    compileOnly("org.keycloak:keycloak-server-spi")
+  implementation(platform("org.keycloak.bom:keycloak-spi-bom:${keycloakVersion}"))
+  compileOnly("org.keycloak:keycloak-core")
+  compileOnly("org.keycloak:keycloak-services:${keycloakVersion}")
+  compileOnly("org.keycloak:keycloak-server-spi")
 
-    compileOnly("org.slf4j:slf4j-api:${slf4jVersion}")
+  compileOnly("org.slf4j:slf4j-api:${slf4jVersion}")
 
-    testImplementation(libs.junit.jupiter)
+  testImplementation(libs.junit.jupiter)
 
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+  testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
 java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(javaVersion)
-    }
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(javaVersion)
+  }
 }
 
 tasks.named<Test>("test") {
-    useJUnitPlatform()
+  useJUnitPlatform()
 }
 
 repositories {
-    mavenCentral()
+  mavenCentral()
 }
 
 
