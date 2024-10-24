@@ -3,7 +3,7 @@ plugins {
   id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
 }
 
-rootProject.name = "keycloak-affix-protocol-mapper-root"
+rootProject.name = "keycloak-affix-role-protocol-mapper-root"
 
 include("lib")
-project(":lib").name = "keycloak-affix-protocol-mapper"
+project(":lib").name = "keycloak-affix-role-protocol-mapper"
