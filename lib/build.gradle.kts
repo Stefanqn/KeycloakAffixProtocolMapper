@@ -20,7 +20,7 @@ version = System.getenv("GITHUB_TAG").let { tag ->
 }
 
 tasks.jar {
-  archiveBaseName = "affix-protocol-mapper" // e.g. affix-protocol-mapper-0.1.0.jar
+  archiveBaseName = "affix-role-protocol-mapper" // e.g. affix-protocol-mapper-0.1.0.jar
   project.version = "" //remove version from jar - for renovate
   manifest {
     attributes(

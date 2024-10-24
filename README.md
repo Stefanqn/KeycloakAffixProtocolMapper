@@ -1,28 +1,41 @@
-# KeycloakAffixProtocolMapper
+# Keycloak-Affix-Role-Protocol-Mapper
 
-Prefix / Suffix Protocol Mapper for Keycloak.
+OIDC Prefix / Suffix Protocol Mapper for Keycloak. 
+It allows filtering (client and/ or realm) roles to a claim based on their prefix and or suffix and optionally stripping them. 
 
-## Dev
-### Github Release
-`gh release create v0.0.1 --title "0.0.1" --notes "initial release"`
-### Deploy to k8s
-`kubectl create configmap affix-mapper --namespace keycloak  --from-file=./lib/build/libs/affix-protocol-mapper.jar --dry-run=client -o yaml | kubectl apply -f -`
-
-## Tests
-add tests, e.g. with a [keycloak testcontainer](https://github.com/dasniko/testcontainers-keycloak) and its [kotest extension](https://github.com/kotest/kotest-extensions-testcontainers)
+e.g.
+![Sample mapper config](doc/AffixMapperConfig.png)
+and a user that among others contains the roles:
+* `nextcloud_admin_group`
+* `nextcloud_family_group`
+* `nextcloud_user`
+results in claim
+```yaml
+  "nextcloud_groups": [
+    "admin",
+    "family"
+  ],
+```
 
 
 ## use
 
-In Keycloak kustomize
+Add it to Keycloak, e.g. by adding to a configmap.
+
+e.g. via Kustomize:
 ```yaml
 
 configMapGenerator:
-  - name: affix-mapper
+  - name: affix-role-protocol-mapper
     files:
-      - https://github.com/Stefanqn/KeycloakAffixProtocolMapper/releases/download/v0.0.1/affix-protocol-mapper-0.0.1.jar # unknown renovate detection
+      - https://github.com/Stefanqn/KeycloakAffixProtocolMapper/releases/download/v0.0.2/affix-role-protocol-mapper.jar # unknown renovate detection
 ```
-in keycloaks instance
+or via `kubectl`: 
+```bash
+kubectl create configmap affix-role-protocol-mapper --namespace keycloak  --from-file=./lib/build/libs/affix-role-protocol-mapper.jar --dry-run=client -o yaml | kubectl apply -f -
+```
+
+Map it to Keycloak via its operator:
 ```yaml
   unsupported:
     podTemplate:
@@ -30,22 +43,23 @@ in keycloaks instance
         containers:
           - name: keycloak
             volumeMounts:
-              - name: affix-mapper
-                mountPath: /opt/keycloak/providers/
-                subPath: affix-protocol-mapper.jar
+              - name: affix-role-protocol-mapper
+                mountPath: /opt/keycloak/providers/affix-role-protocol-mapper.jar
+                subPath: affix-role-protocol-mapper.jar
         volumes:
-          - name: affix-mapper
+          - name: affix-role-protocol-mapper
             configMap:
-              name: affix-mapper
+              name: affix-role-protocol-mapper
 ```
 
+Configure it, e.g. via Terraform: 
 ```terraform
-resource "keycloak_generic_protocol_mapper" "affix_protocol_mapper" {
+resource "keycloak_generic_protocol_mapper" "affix_role_protocol_mapper" {
   realm_id        = keycloak_realm.main.id
   client_scope_id = keycloak_openid_client_scope.nextcloud_client_scope.id
   name            = "Affix(Prefix/ Suffix) Protocol Mapper"
   protocol        = "openid-connect"
-  protocol_mapper = "oidc-affix-mapper"
+  protocol_mapper = "oidc-affix-role-protocol-mapper"
   config = {
     "claim.name"                = "nextcloud_groups"
     "multivalued"               = "true"
@@ -59,3 +73,13 @@ resource "keycloak_generic_protocol_mapper" "affix_protocol_mapper" {
   }
 }
 ```
+
+## Dev
+### Github Release
+`gh release create v0.0.1 --title "0.0.1" --notes "initial release"`
+### Deploy to k8s
+`kubectl create configmap affix-mapper --namespace keycloak  --from-file=./lib/build/libs/affix-protocol-mapper.jar --dry-run=client -o yaml | kubectl apply -f -`
+
+## Tests (TODO)
+add tests, e.g. with a [keycloak testcontainer](https://github.com/dasniko/testcontainers-keycloak) and its [kotest extension](https://github.com/kotest/kotest-extensions-testcontainers)
+
