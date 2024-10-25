@@ -57,18 +57,22 @@ Configure it, e.g. via Terraform:
 resource "keycloak_generic_protocol_mapper" "affix_role_protocol_mapper" {
   realm_id        = keycloak_realm.main.id
   client_scope_id = keycloak_openid_client_scope.nextcloud_client_scope.id
-  name            = "Affix(Prefix/ Suffix) Protocol Mapper"
+  name            = "nextcloud group mapper"
   protocol        = "openid-connect"
   protocol_mapper = "oidc-affix-role-protocol-mapper"
-  config = {
+  config          = {
     "claim.name"                = "nextcloud_groups"
     "multivalued"               = "true"
-    "lowerBound"                = "nextcloud_"
-    "upperBound"                = "_group"
-    "id.token.claim"            = "true"
+    "prefix"                    = "nextcloud_"
+    "suffix"                    = "_group"
     "access.token.claim"        = "true"
     "introspection.token.claim" = "true"
-    "lightweight.claim"         = "true"
+    "id.token.claim"            = "false"
+    "include-client-roles"      = "false"
+    "include-realm-roles"       = "false"
+    "lightweight.claim"         = "false"
+    "strip-prefix"              = "false"
+    "strip-suffix"              = "false"
     "userinfo.token.claim"      = "false"
   }
 }
